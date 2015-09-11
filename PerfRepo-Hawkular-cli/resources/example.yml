@@ -1,0 +1,24 @@
+!org.hawkular.qe.tools.perfrepo.Settings
+perfrepo: 
+   testUID: haw_write_stability_test
+   testExecturionName: haw_write_stability_test_exec_1
+   csvFilePath: ./resources/myhttp-response.stats.csv
+   csvFileDelimiter: ;
+parameters: 
+   commit_hash: aaaaa
+tags: 
+- tag1
+- tag2
+- tag3
+metrics: 
+- Disk usage
+- Response time - avg
+- Response time - max
+- Response time - min
+- Throughput - avg
+- Throughput - max
+- Throughput - min
+attachments:
+  exampleAttName: 
+  - text/plain
+  - ./resources/example.yml
