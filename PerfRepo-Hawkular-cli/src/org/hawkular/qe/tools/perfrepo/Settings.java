@@ -9,6 +9,7 @@ public class Settings {
 	public ArrayList<String> tags;
 	// Test Execution Parameters
 	public Map<String, String> parameters;
+	// Test Execution Metrics
 	public ArrayList<MetricGlue> metrics;
 	public Map<String, String> perfrepo;
 	public Map<String, ArrayList<String>> attachments;
@@ -22,34 +23,38 @@ public class Settings {
 	}
 
 	public void printList(ArrayList<?> l, String label) {
-		System.out.println(label + ":");
+		PerfRepoClientWrapper.logger.info(label + ":");
+		String out = "";
 		for (Object value : l) {
 			if (value.getClass() == String.class)
-				System.out.println("\t" + value);
+				out += "\n\t" + value;
 			if (value.getClass() == MetricGlue.class) {
 				MetricGlue mg = (MetricGlue) value;
-				System.out.println("\tRemoteName: " + mg.remoteName
-						+ "\tCSVColumnName: " + mg.CSVColumnName);
+				out += "\n\tRemoteName: " + mg.remoteName + "\tCSVColumnName: "
+						+ mg.CSVColumnName;
 			}
 		}
+		PerfRepoClientWrapper.logger.info(out);
 	}
 
 	@SuppressWarnings("unchecked")
 	// for line: for (String s : (ArrayList<String>) value) {
 	public void printHashMap(Map<String, ?> hm, String label) {
-		System.out.println(label + ":");
+		String out = "";
+		PerfRepoClientWrapper.logger.info(label + ":");
 		for (String name : hm.keySet()) {
 			String key = name.toString();
 			Object value = hm.get(name).toString();
 			if (value.getClass() == String.class)
-				System.out.println("\t" + key + ": " + value);
+				out += "\n\t" + key + ": " + value + "";
 			if (value.getClass() == ArrayList.class) {
-				System.out.println("\t" + key + ":");
+				out += "\n\t" + key + ":";
 				for (String s : (ArrayList<String>) value) {
-					System.out.println("\t\t" + s);
+					out += "\n\t\t" + s;
 				}
 			}
 		}
+		PerfRepoClientWrapper.logger.info(out);
 	}
 
 	// *.yml file data getters

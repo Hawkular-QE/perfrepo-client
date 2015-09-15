@@ -17,7 +17,8 @@ public class CSVFile {
 	public String csvFilePath;
 	public String delimiter; // ;
 
-	@SuppressWarnings("unchecked") // for line: body = new ArrayList[head.length];
+	@SuppressWarnings("unchecked")
+	// for line: body = new ArrayList[head.length];
 	public CSVFile(String csvFilePath, String delimiter) {
 		this.csvFilePath = csvFilePath;
 		this.delimiter = delimiter;
@@ -60,19 +61,18 @@ public class CSVFile {
 	public void printCSV() {
 		if (head == null || body == null)
 			return;
-		System.out.println("Head:");
+		String out = "\nHead:\n";
 		for (int i = 0; i < head.length; i++)
-			System.out.print(head[i] + delimiter);
-		System.out.println("");
+			out += head[i] + (head.length - 1 == i ? "" : delimiter);
 		int lines = body[0].size();
-		System.out.println("Body:");
+		out += ("\nBody:");
 		for (int ii = 0; ii < lines; ii++) {
 			for (int i = 0; i < body.length; i++) {
-				System.out.print(body[i].get(ii) + delimiter);
+				out += body[i].get(ii)
+						+ (body.length - 1 == i ? "" : delimiter);
 			}
-			System.out.println("");
 		}
-		System.out.println("");
+		PerfRepoClientWrapper.logger.info(out);
 	}
 
 }

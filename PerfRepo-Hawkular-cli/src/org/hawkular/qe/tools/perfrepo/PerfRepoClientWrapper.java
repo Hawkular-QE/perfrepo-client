@@ -14,7 +14,7 @@ import org.perfrepo.client.PerfRepoClient;
 import org.perfrepo.model.Test;
 import org.perfrepo.model.TestExecution;
 import org.perfrepo.model.builder.TestExecutionBuilder;
-
+import org.apache.log4j.Logger;
 import org.hawkular.qe.tools.perfrepo.CSVFile;
 import org.hawkular.qe.tools.perfrepo.Settings;
 
@@ -37,12 +37,15 @@ public class PerfRepoClientWrapper {
 			+ "\t-DtestUId=\"perfrepoClientTestUId\" Test UId"
 			+ "\t-DsettingsFile=\"./resources/example.yml\" resource YAML file";
 
+	final static Logger logger = Logger.getLogger(PerfRepoClientWrapper.class);
+
 	public static void main(String[] args) {
+		logger.info("Starting PerfRepoClient wrapper\nRead more: https://github.com/Hawkular-QE/perfrepo-client");
 		// help printing
 		if (Arrays.asList(args).contains("help")
 				|| Arrays.asList(args).contains("--help")
 				|| Arrays.asList(args).contains("-h"))
-			System.out.println(PerfRepoClientWrapper.help);
+			logger.info(PerfRepoClientWrapper.help);
 
 		try {
 			PerfRepoClientWrapper ptt = new PerfRepoClientWrapper();
@@ -51,13 +54,16 @@ public class PerfRepoClientWrapper {
 					ptt.settings.getCsvFilePath());
 			ptt.pushData(ptt.csv, ptt.settings);
 		} catch (Exception e) {
+			logger.error("Error occured, see below");
 			e.printStackTrace();
 		} finally {
-			System.out.println("Finished");
+			logger.info("Finished");
 		}
 	}
 
 	public void loadCSV(String delimeter, String filePath) {
+		logger.info("Loading CSV file: " + filePath);
+		logger.info("CSV file expected delimiter: " + delimeter);
 		csv = new CSVFile(filePath, delimeter);
 		csv.printCSV();
 	}
@@ -68,7 +74,7 @@ public class PerfRepoClientWrapper {
 		String basicHash = Settings.getBasicHash();
 		String testUId = settings.getTestUId();
 		String testExecutionName = settings.getTestExecutionName();
-		System.out.println("TestUId: " + testUId);
+		logger.info("TestUId: " + testUId);
 		PerfRepoClient client = new PerfRepoClient(host, url, basicHash);
 
 		TestExecutionBuilder testExecutionBuilder = TestExecution.builder();
@@ -78,63 +84,69 @@ public class PerfRepoClientWrapper {
 		Date date = new Date();
 		testExecutionBuilder.started(date);
 		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		System.out.println("Started at: " + formatter.format(date));
+		logger.info("Started at: " + formatter.format(date));
 
 		Test t = client.getTestByUid(testUId);
 		if (t == null) {
-			System.out.println("Ending test because of wrong TestUId");
+			logger.error("Ending test because of wrong TestUId");
 			return;
 		}
 
 		// SET PARAMETERS
 		if (data.parameters != null) {
-			System.out.println("Loading parameters...");
+			logger.info("Loading parameters...");
+			String out = "";
 			Map<String, String> hm = data.parameters;
 			for (int i = 0; i < data.parameters.size(); i++) {
 				for (String name : hm.keySet()) {
 					String key = name.toString();
 					String value = hm.get(name).toString();
-					System.out.println("\t" + key + ": " + value);
+					out += "\n\t" + key + ": " + value;
 					testExecutionBuilder.parameter(key, value);
 				}
 			}
+			logger.info(out);
 		}
 
 		// SET TAGS
 		if (data.tags != null) {
-			System.out.println("Loading tags...");
+			String out = "";
+			logger.info("Loading tags...");
 			for (String tag : data.tags) {
-				System.out.println("\t" + tag);
+				out += "\n\t" + tag;
 				testExecutionBuilder.tag(tag);
 			}
+			logger.info(out);
 		}
 
 		// SET VALUES
 		if (csv.body != null) {
-			System.out.println("Loading values...");
+			logger.info("Loading values...");
+			String out = "";
 			for (int i = 0; i < csv.body.length; i++) {
 				String csvMetricName = csv.head[i];
-				System.out.println("\t" + csvMetricName + ":");
+				out += "\n\t" + csvMetricName + ":";
 				for (MetricGlue mg : settings.metrics) {
 					if (mg.CSVColumnName.matches(csvMetricName)) {
 						for (String sv : csv.body[i]) {
 							testExecutionBuilder.value(mg.remoteName,
 									Double.parseDouble(sv));
-							System.out.println("\t\t" + sv);
+							out += "\n\t\t" + sv;
 						}
 					}
 				}
 			}
+			logger.info(out);
 		}
 
 		// BUILD TEST EXECUTION
-		System.out.println("Building test execution...");
+		logger.info("Building test execution...");
 		TestExecution testExecution = testExecutionBuilder.build();
 		double testExecutionId = client.createTestExecution(testExecution);
-		System.out.println("\tTestExecutionId: " + testExecutionId);
+		logger.info("\tTestExecutionId: " + testExecutionId);
 
 		// SET ATTACHMENTS - text/plain
-		System.out.println("Loading attachments...");
+		logger.info("Loading attachments...");
 		for (String name : data.attachments.keySet()) {
 			ArrayList<String> value = (ArrayList<String>) data.attachments
 					.get(name);
@@ -145,11 +157,11 @@ public class PerfRepoClientWrapper {
 	}
 
 	public void loadSettings() throws FileNotFoundException, YamlException {
-		YamlReader reader = new YamlReader(new FileReader(
-				Settings.getSettingsFile()));
+		String file = Settings.getSettingsFile();
+		logger.info("Loading settings file: " + file);
+		YamlReader reader = new YamlReader(new FileReader(file));
 		settings = (Settings) reader.read();
 		settings.printSettings();
-		System.out.println("\n");
 	}
 
 }
