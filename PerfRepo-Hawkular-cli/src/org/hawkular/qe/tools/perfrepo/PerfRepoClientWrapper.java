@@ -1,44 +1,31 @@
 package org.hawkular.qe.tools.perfrepo;
-import java.io.BufferedReader;
+
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.text.DateFormat;
-import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.perfrepo.client.PerfRepoClient;
-import org.perfrepo.model.Metric;
 import org.perfrepo.model.Test;
 import org.perfrepo.model.TestExecution;
-import org.perfrepo.model.TestMetric;
-import org.perfrepo.model.builder.TestBuilder;
 import org.perfrepo.model.builder.TestExecutionBuilder;
-import org.perfrepo.model.user.User;
 
 import org.hawkular.qe.tools.perfrepo.CSVFile;
 import org.hawkular.qe.tools.perfrepo.Settings;
 
-
 import com.esotericsoftware.yamlbeans.YamlException;
 import com.esotericsoftware.yamlbeans.YamlReader;
-import com.esotericsoftware.yamlbeans.YamlWriter;
 
 /**
  * @author Vojtěch Průša vprusa@redhat.com
  * @version 1.0
  */
-public class PerfRepoClientWrapper{
+public class PerfRepoClientWrapper {
 
 	public CSVFile csv;
 	public Settings settings;
@@ -51,6 +38,7 @@ public class PerfRepoClientWrapper{
 			+ "\t-DsettingsFile=\"./resources/example.yml\" resource YAML file";
 
 	public static void main(String[] args) {
+		// help printing
 		if (Arrays.asList(args).contains("help")
 				|| Arrays.asList(args).contains("--help")
 				|| Arrays.asList(args).contains("-h"))
@@ -64,8 +52,9 @@ public class PerfRepoClientWrapper{
 			ptt.pushData(ptt.csv, ptt.settings);
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			System.out.println("Finished");
 		}
-		System.out.println("Finished");
 	}
 
 	public void loadCSV(String delimeter, String filePath) {
@@ -74,9 +63,9 @@ public class PerfRepoClientWrapper{
 	}
 
 	public void pushData(CSVFile csv, Settings data) throws Exception {
-		String host = settings.getHost();
-		String url = settings.getUrl(); 
-		String basicHash = settings.getBasicHash();
+		String host = Settings.getHost();
+		String url = Settings.getUrl();
+		String basicHash = Settings.getBasicHash();
 		String testUId = settings.getTestUId();
 		String testExecutionName = settings.getTestExecutionName();
 		System.out.println("TestUId: " + testUId);
@@ -114,7 +103,7 @@ public class PerfRepoClientWrapper{
 		// SET TAGS
 		if (data.tags != null) {
 			System.out.println("Loading tags...");
-			for (String tag : (ArrayList<String>) data.tags) {
+			for (String tag : data.tags) {
 				System.out.println("\t" + tag);
 				testExecutionBuilder.tag(tag);
 			}
@@ -124,12 +113,12 @@ public class PerfRepoClientWrapper{
 		if (csv.body != null) {
 			System.out.println("Loading values...");
 			for (int i = 0; i < csv.body.length; i++) {
-				String metricName = csv.head[i];
-				System.out.println("\t" + metricName + ":");
-				for (String metric : (ArrayList<String>) settings.metrics) {
-					if (metric.matches(metricName)) {
-						for (String sv : (ArrayList<String>) csv.body[i]) {
-							testExecutionBuilder.value(metricName,
+				String csvMetricName = csv.head[i];
+				System.out.println("\t" + csvMetricName + ":");
+				for (MetricGlue mg : settings.metrics) {
+					if (mg.CSVColumnName.matches(csvMetricName)) {
+						for (String sv : csv.body[i]) {
+							testExecutionBuilder.value(mg.remoteName,
 									Double.parseDouble(sv));
 							System.out.println("\t\t" + sv);
 						}
@@ -147,7 +136,6 @@ public class PerfRepoClientWrapper{
 		// SET ATTACHMENTS - text/plain
 		System.out.println("Loading attachments...");
 		for (String name : data.attachments.keySet()) {
-			String key = name.toString();
 			ArrayList<String> value = (ArrayList<String>) data.attachments
 					.get(name);
 			client.uploadAttachment((long) testExecutionId,

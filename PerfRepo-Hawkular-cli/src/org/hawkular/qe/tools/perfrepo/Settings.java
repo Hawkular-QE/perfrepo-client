@@ -1,17 +1,17 @@
 package org.hawkular.qe.tools.perfrepo;
+
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Settings {
+
 	// Test Execution Tags
-	public ArrayList tags;
+	public ArrayList<String> tags;
 	// Test Execution Parameters
 	public Map<String, String> parameters;
-	public ArrayList metrics;
+	public ArrayList<MetricGlue> metrics;
 	public Map<String, String> perfrepo;
-	public Map<String, ArrayList> attachments;
+	public Map<String, ArrayList<String>> attachments;
 
 	public void printSettings() {
 		printList(tags, "tags");
@@ -21,12 +21,21 @@ public class Settings {
 		printHashMap(perfrepo, "perfrepo");
 	}
 
-	public void printList(ArrayList l, String label) {
+	public void printList(ArrayList<?> l, String label) {
 		System.out.println(label + ":");
-		for (int i = 0; i < l.size(); i++)
-			System.out.println("\t" + l.get(i));
+		for (Object value : l) {
+			if (value.getClass() == String.class)
+				System.out.println("\t" + value);
+			if (value.getClass() == MetricGlue.class) {
+				MetricGlue mg = (MetricGlue) value;
+				System.out.println("\tRemoteName: " + mg.remoteName
+						+ "\tCSVColumnName: " + mg.CSVColumnName);
+			}
+		}
 	}
 
+	@SuppressWarnings("unchecked")
+	// for line: for (String s : (ArrayList<String>) value) {
 	public void printHashMap(Map<String, ?> hm, String label) {
 		System.out.println(label + ":");
 		for (String name : hm.keySet()) {
@@ -36,12 +45,32 @@ public class Settings {
 				System.out.println("\t" + key + ": " + value);
 			if (value.getClass() == ArrayList.class) {
 				System.out.println("\t" + key + ":");
-				for(String s : (ArrayList<String>) value){
-					System.out.println("\t\t"+ value);
+				for (String s : (ArrayList<String>) value) {
+					System.out.println("\t\t" + s);
 				}
 			}
 		}
 	}
+
+	// *.yml file data getters
+
+	public String getTestUId() {
+		return perfrepo.get("testUID");
+	}
+
+	public String getTestExecutionName() {
+		return perfrepo.get("testExecturionName");
+	}
+
+	public String getDelimiter() {
+		return perfrepo.get("csvFileDelimiter");
+	}
+
+	public String getCsvFilePath() {
+		return perfrepo.get("csvFilePath");
+	}
+
+	// Static getters
 
 	public static String getHost() {
 		return System.getProperty("host");
@@ -58,22 +87,6 @@ public class Settings {
 
 	public static String getSettingsFile() {
 		return System.getProperty("settingsFile");
-	}
-
-	public String getTestUId() {
-		return perfrepo.get("testUID");
-	}
-
-	public String getTestExecutionName() {
-		return perfrepo.get("testExecturionName");
-	}
-
-	public String getDelimiter() {
-		return perfrepo.get("csvFileDelimiter");
-	}
-
-	public String getCsvFilePath() {
-		return perfrepo.get("csvFilePath");
 	}
 
 }

@@ -10,14 +10,28 @@ tags:
 - tag1
 - tag2
 - tag3
-metrics: 
-- Disk usage
-- Response time - avg
-- Response time - max
-- Response time - min
-- Throughput - avg
-- Throughput - max
-- Throughput - min
+metrics:
+- !org.hawkular.qe.tools.perfrepo.MetricGlue
+  CSVColumnName: Disk usage
+  remoteName: Disk usage
+- !org.hawkular.qe.tools.perfrepo.MetricGlue
+  CSVColumnName: Response time - avg
+  remoteName: Response time - avg
+- !org.hawkular.qe.tools.perfrepo.MetricGlue
+  CSVColumnName: Response time - max
+  remoteName: Response time - max
+- !org.hawkular.qe.tools.perfrepo.MetricGlue
+  CSVColumnName: Response time - min
+  remoteName: Response time - min
+- !org.hawkular.qe.tools.perfrepo.MetricGlue
+  CSVColumnName: Throughput - avg
+  remoteName: Throughput - avg
+- !org.hawkular.qe.tools.perfrepo.MetricGlue
+  CSVColumnName: Throughput - max
+  remoteName: Throughput - max
+- !org.hawkular.qe.tools.perfrepo.MetricGlue
+  CSVColumnName: Throughput - min
+  remoteName: Throughput - min
 attachments:
   exampleAttName: 
   - text/plain
