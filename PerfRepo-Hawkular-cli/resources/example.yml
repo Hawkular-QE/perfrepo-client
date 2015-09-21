@@ -2,7 +2,6 @@
 perfrepo: 
    testUID: haw_write_stability_test
    testExecturionName: haw_write_stability_test_exec_1
-   csvFilePath: ./resources/myhttp-response.stats.csv
    csvFileDelimiter: ;
 parameters: 
    commit_hash: aaaaa
@@ -11,27 +10,34 @@ tags:
 - tag2
 - tag3
 metrics:
-- !org.hawkular.qe.tools.perfrepo.MetricGlue
-  CSVColumnName: Disk usage
-  remoteName: Disk usage
-- !org.hawkular.qe.tools.perfrepo.MetricGlue
-  CSVColumnName: Response time - avg
-  remoteName: Response time - avg
-- !org.hawkular.qe.tools.perfrepo.MetricGlue
-  CSVColumnName: Response time - max
-  remoteName: Response time - max
-- !org.hawkular.qe.tools.perfrepo.MetricGlue
-  CSVColumnName: Response time - min
-  remoteName: Response time - min
-- !org.hawkular.qe.tools.perfrepo.MetricGlue
-  CSVColumnName: Throughput - avg
-  remoteName: Throughput - avg
-- !org.hawkular.qe.tools.perfrepo.MetricGlue
-  CSVColumnName: Throughput - max
-  remoteName: Throughput - max
-- !org.hawkular.qe.tools.perfrepo.MetricGlue
-  CSVColumnName: Throughput - min
-  remoteName: Throughput - min
+- !org.hawkular.qe.tools.perfrepo.CSVColMap
+  sourceCSVFilePath: ./resources/myhttp-response.stats.csv
+  metricColRelation:
+  - !org.hawkular.qe.tools.perfrepo.MetricColRelation
+    CSVColumnName: Disk usage
+    remoteMetricName: Disk usage
+  - !org.hawkular.qe.tools.perfrepo.MetricColRelation
+    CSVColumnName: Response time - avg
+    remoteMetricName: Response time - avg
+- !org.hawkular.qe.tools.perfrepo.CSVColMap
+  sourceCSVFilePath: ./resources/myhttp-response.stats.csv
+  metricColRelation:
+  - !org.hawkular.qe.tools.perfrepo.MetricColRelation
+    CSVColumnName: Response time - max
+    remoteMetricName: Response time - max
+  - !org.hawkular.qe.tools.perfrepo.MetricColRelation
+    CSVColumnName: Response time - min
+    remoteMetricName: Response time - min
+  - !org.hawkular.qe.tools.perfrepo.MetricColRelation
+    CSVColumnName: Throughput - avg
+    remoteMetricName: Throughput - avg
+  - !org.hawkular.qe.tools.perfrepo.MetricColRelation
+    CSVColumnName: Throughput - max
+    remoteMetricName: Throughput - max
+  - !org.hawkular.qe.tools.perfrepo.MetricColRelation
+    CSVColumnName: Throughput - min
+    remoteMetricName: Throughput - min
+
 attachments:
   exampleAttName: 
   - text/plain

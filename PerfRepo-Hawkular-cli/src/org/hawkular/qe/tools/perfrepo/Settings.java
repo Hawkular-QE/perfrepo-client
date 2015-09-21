@@ -10,7 +10,7 @@ public class Settings {
 	// Test Execution Parameters
 	public Map<String, String> parameters;
 	// Test Execution Metrics
-	public ArrayList<MetricGlue> metrics;
+	public ArrayList<CSVColMap> metrics;
 	public Map<String, String> perfrepo;
 	public Map<String, ArrayList<String>> attachments;
 
@@ -28,10 +28,13 @@ public class Settings {
 		for (Object value : l) {
 			if (value.getClass() == String.class)
 				out += "\n\t" + value;
-			if (value.getClass() == MetricGlue.class) {
-				MetricGlue mg = (MetricGlue) value;
-				out += "\n\tRemoteName: " + mg.remoteName + "\tCSVColumnName: "
-						+ mg.CSVColumnName;
+			if (value.getClass() == CSVColMap.class) {
+				CSVColMap cm = (CSVColMap) value;
+				out += "\n\tFile: " + cm.sourceCSVFilePath;
+				for (MetricColRelation mcr : cm.metricColRelation) {
+					out += "\n\t\tRemoteMetricName: " + mcr.remoteMetricName
+							+ "\tCSVColumnName: " + mcr.CSVColumnName;
+				}
 			}
 		}
 		PerfRepoClientWrapper.logger.info(out);

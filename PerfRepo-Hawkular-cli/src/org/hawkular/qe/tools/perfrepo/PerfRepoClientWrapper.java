@@ -27,8 +27,9 @@ import com.esotericsoftware.yamlbeans.YamlReader;
  */
 public class PerfRepoClientWrapper {
 
-	public CSVFile csv;
+	// public ArrayList<CSVFile> csvs;
 	public Settings settings;
+	public ArrayList<CSVColMap> values;
 	public static String help = "Pushes data from *.csv to PerfRepo with *.yml setting file\n"
 			+ "Necessary:\n"
 			+ "\t-Dhost=\"IP:PORT\" IP & Port of PerfRepo host"
@@ -50,9 +51,8 @@ public class PerfRepoClientWrapper {
 		try {
 			PerfRepoClientWrapper ptt = new PerfRepoClientWrapper();
 			ptt.loadSettings();
-			ptt.loadCSV(ptt.settings.getDelimiter(),
-					ptt.settings.getCsvFilePath());
-			ptt.pushData(ptt.csv, ptt.settings);
+			ptt.loadCSVs(ptt.settings.getDelimiter());
+			ptt.pushData(ptt.values, ptt.settings);
 		} catch (Exception e) {
 			logger.error("Error occured, see below");
 			e.printStackTrace();
@@ -61,14 +61,37 @@ public class PerfRepoClientWrapper {
 		}
 	}
 
-	public void loadCSV(String delimeter, String filePath) {
-		logger.info("Loading CSV file: " + filePath);
-		logger.info("CSV file expected delimiter: " + delimeter);
-		csv = new CSVFile(filePath, delimeter);
-		csv.printCSV();
+	public void loadSettings() throws FileNotFoundException, YamlException {
+		String file = Settings.getSettingsFile();
+		logger.info("Loading settings file: " + file);
+		YamlReader reader = new YamlReader(new FileReader(file));
+		settings = (Settings) reader.read();
+		// equivalent but easier access
+		values = settings.metrics;
+		settings.printSettings();
 	}
 
-	public void pushData(CSVFile csv, Settings data) throws Exception {
+	public void loadCSVs(String delimeter) {
+		// csvs = new ArrayList<CSVFile>();
+		logger.info("CSVs file expected delimiter: " + delimeter);
+		for (CSVColMap colMap : settings.metrics) {
+			CSVFile csv = this.loadCSV(delimeter, colMap.sourceCSVFilePath);
+			for (MetricColRelation mcr : colMap.metricColRelation) {
+				mcr.values = csv.getColumnValues(mcr.CSVColumnName);
+			}
+		}
+
+	}
+
+	public CSVFile loadCSV(String delimeter, String filePath) {
+		logger.info("Loading CSV file: " + filePath);
+		CSVFile csv = new CSVFile(filePath, delimeter);
+		csv.printCSV();
+		return csv;
+	}
+
+	public void pushData(ArrayList<CSVColMap> csvs, Settings data)
+			throws Exception {
 		String host = Settings.getHost();
 		String url = Settings.getUrl();
 		String basicHash = Settings.getBasicHash();
@@ -120,24 +143,19 @@ public class PerfRepoClientWrapper {
 		}
 
 		// SET VALUES
-		if (csv.body != null) {
-			logger.info("Loading values...");
-			String out = "";
-			for (int i = 0; i < csv.body.length; i++) {
-				String csvMetricName = csv.head[i];
-				out += "\n\t" + csvMetricName + ":";
-				for (MetricGlue mg : settings.metrics) {
-					if (mg.CSVColumnName.matches(csvMetricName)) {
-						for (String sv : csv.body[i]) {
-							testExecutionBuilder.value(mg.remoteName,
-									Double.parseDouble(sv));
-							out += "\n\t\t" + sv;
-						}
-					}
+		String out = "";
+		for (CSVColMap cm : values) {
+			logger.info("Loading values from file: " + cm.sourceCSVFilePath);
+			for (MetricColRelation mcr : cm.metricColRelation) {
+				out += "\n\t" + mcr.remoteMetricName + ":";
+				for (String val : mcr.values) {
+					testExecutionBuilder.value(mcr.remoteMetricName,
+							Double.parseDouble(val));
+					out += "\n\t\t" + val;
 				}
 			}
-			logger.info(out);
 		}
+		logger.info(out);
 
 		// BUILD TEST EXECUTION
 		logger.info("Building test execution...");
@@ -154,14 +172,6 @@ public class PerfRepoClientWrapper {
 					new File(value.get(1)), value.get(0), name);
 		}
 
-	}
-
-	public void loadSettings() throws FileNotFoundException, YamlException {
-		String file = Settings.getSettingsFile();
-		logger.info("Loading settings file: " + file);
-		YamlReader reader = new YamlReader(new FileReader(file));
-		settings = (Settings) reader.read();
-		settings.printSettings();
 	}
 
 }

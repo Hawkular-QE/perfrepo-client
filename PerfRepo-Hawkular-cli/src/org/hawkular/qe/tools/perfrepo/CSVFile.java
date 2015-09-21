@@ -58,6 +58,15 @@ public class CSVFile {
 		}
 	}
 
+	public ArrayList<String> getColumnValues(String name) {
+		for(int i = 0; i < head.length; i++){
+			if(head[i].matches(name)){
+				return body[i];
+			}
+		}
+		return null;
+	}
+
 	public void printCSV() {
 		if (head == null || body == null)
 			return;
