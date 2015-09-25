@@ -63,19 +63,20 @@ public class Settings {
 	// *.yml file data getters
 
 	public String getTestUId() {
-		return perfrepo.get("testUID");
+		return (System.getProperty("testUID") != null ? System
+				.getProperty("testUID") : perfrepo.get("testUID"));
 	}
 
 	public String getTestExecutionName() {
-		return perfrepo.get("testExecturionName");
+		return (System.getProperty("testExecturionName") != null ? System
+				.getProperty("testExecturionName") : perfrepo
+				.get("testExecturionName"));
 	}
 
 	public String getDelimiter() {
-		return perfrepo.get("csvFileDelimiter");
-	}
-
-	public String getCsvFilePath() {
-		return perfrepo.get("csvFilePath");
+		return (System.getProperty("csvFileDelimiter") != null ? System
+				.getProperty("csvFileDelimiter") : perfrepo
+				.get("csvFileDelimiter"));
 	}
 
 	// Static getters

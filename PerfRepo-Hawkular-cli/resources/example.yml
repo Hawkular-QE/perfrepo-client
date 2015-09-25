@@ -1,44 +1,50 @@
 !org.hawkular.qe.tools.perfrepo.Settings
-perfrepo: 
+perfrepo:
    testUID: haw_write_stability_test
    testExecturionName: haw_write_stability_test_exec_1
-   csvFileDelimiter: ;
-parameters: 
+   csvFileDelimiter: \,
+parameters:
    commit_hash: aaaaa
-tags: 
+tags:
 - tag1
 - tag2
 - tag3
 metrics:
 - !org.hawkular.qe.tools.perfrepo.CSVColMap
-  sourceCSVFilePath: ./resources/myhttp-response.stats.csv
+  sourceCSVFilePath: ./resources/gauges-post-response-stats.csv
+  multimetricParamCSVColumnName: Time
+  multimetricParamRemoteName: Time [ms]
+  metricColRelation:
+  - !org.hawkular.qe.tools.perfrepo.MetricColRelation
+    CSVColumnName: Maximum
+    remoteMetricName: Response time - max
+  - !org.hawkular.qe.tools.perfrepo.MetricColRelation
+    CSVColumnName: Average
+    remoteMetricName: Response time - avg
+  - !org.hawkular.qe.tools.perfrepo.MetricColRelation
+    CSVColumnName: Minimum
+    remoteMetricName: Response time - min
+- !org.hawkular.qe.tools.perfrepo.CSVColMap
+  sourceCSVFilePath: ./resources/gauges-post-disk-usage.csv
   metricColRelation:
   - !org.hawkular.qe.tools.perfrepo.MetricColRelation
     CSVColumnName: Disk usage
     remoteMetricName: Disk usage
-  - !org.hawkular.qe.tools.perfrepo.MetricColRelation
-    CSVColumnName: Response time - avg
-    remoteMetricName: Response time - avg
 - !org.hawkular.qe.tools.perfrepo.CSVColMap
-  sourceCSVFilePath: ./resources/myhttp-response.stats.csv
+  sourceCSVFilePath: ./resources/gauges-post-throughput-stats.csv
+  multimetricParamCSVColumnName: Time
+  multimetricParamRemoteName: Time [ms]
   metricColRelation:
   - !org.hawkular.qe.tools.perfrepo.MetricColRelation
-    CSVColumnName: Response time - max
-    remoteMetricName: Response time - max
-  - !org.hawkular.qe.tools.perfrepo.MetricColRelation
-    CSVColumnName: Response time - min
-    remoteMetricName: Response time - min
-  - !org.hawkular.qe.tools.perfrepo.MetricColRelation
-    CSVColumnName: Throughput - avg
+    CSVColumnName: Average
     remoteMetricName: Throughput - avg
   - !org.hawkular.qe.tools.perfrepo.MetricColRelation
-    CSVColumnName: Throughput - max
-    remoteMetricName: Throughput - max
-  - !org.hawkular.qe.tools.perfrepo.MetricColRelation
-    CSVColumnName: Throughput - min
+    CSVColumnName: Minimum
     remoteMetricName: Throughput - min
-
+  - !org.hawkular.qe.tools.perfrepo.MetricColRelation
+    CSVColumnName: Maximum
+    remoteMetricName: Throughput - max
 attachments:
-  exampleAttName: 
+  exampleAttName:
   - text/plain
   - ./resources/example.yml

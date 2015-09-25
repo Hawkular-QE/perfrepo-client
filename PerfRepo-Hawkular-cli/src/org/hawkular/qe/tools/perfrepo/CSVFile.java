@@ -59,8 +59,8 @@ public class CSVFile {
 	}
 
 	public ArrayList<String> getColumnValues(String name) {
-		for(int i = 0; i < head.length; i++){
-			if(head[i].matches(name)){
+		for (int i = 0; i < head.length; i++) {
+			if (head[i].matches(name)) {
 				return body[i];
 			}
 		}
@@ -74,7 +74,7 @@ public class CSVFile {
 		for (int i = 0; i < head.length; i++)
 			out += head[i] + (head.length - 1 == i ? "" : delimiter);
 		int lines = body[0].size();
-		out += ("\nBody:");
+		out += ("\nBody:\n");
 		for (int ii = 0; ii < lines; ii++) {
 			for (int i = 0; i < body.length; i++) {
 				out += body[i].get(ii)

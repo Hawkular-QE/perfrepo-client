@@ -7,6 +7,15 @@ public class MetricColRelation {
 	public String CSVColumnName;
 	// metric name in PerfRepo
 	public String remoteMetricName;
-	// values
-	public ArrayList<String> values;
+
+	private ArrayList<String> values;
+
+	public ArrayList<String> getValues() {
+		return values;
+	}
+
+	public void setValues(ArrayList<String> values) {
+		this.values = values;
+	}
+
 }

@@ -4,11 +4,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.perfrepo.client.PerfRepoClient;
 import org.perfrepo.model.Test;
@@ -31,12 +33,16 @@ public class PerfRepoClientWrapper {
 	public Settings settings;
 	public ArrayList<CSVColMap> values;
 	public static String help = "Pushes data from *.csv to PerfRepo with *.yml setting file\n"
-			+ "Necessary:\n"
-			+ "\t-Dhost=\"IP:PORT\" IP & Port of PerfRepo host"
-			+ "\t-Durl=\"URL\" URL of PerfRepo (empty = root of PerfRepo host)"
-			+ "\t-DbasicHash=\"base64(username:password)\" PerfRepo username & password encoded by base64"
-			+ "\t-DtestUId=\"perfrepoClientTestUId\" Test UId"
-			+ "\t-DsettingsFile=\"./resources/example.yml\" resource YAML file";
+			+ "Necessary:"
+			+ "\n\t-Dhost=\"IP:PORT\" IP & Port of PerfRepo host"
+			+ "\n\t-Durl=\"URL\" URL of PerfRepo (empty = root of PerfRepo host)"
+			+ "\n\t-DbasicHash=\"base64(username:password)\" PerfRepo username & password encoded by base64"
+			+ "\n\t-DtestUId=\"perfrepoClientTestUId\" Test UId"
+			+ "\n\t-DsettingsFile=\"./resources/example.yml\" resource YAML file"
+			+ "\n\t-testUID=\"Test_example_1\" PerfRepo Test UID"
+			+ "\n\t-testExecturionName=\"Test_example_1_exec_2\" PerfRepo Test execution name"
+			+ "\n\t-csvFileDelimiter=\"./resources/example.yml\" resource YAML file"
+			+ "";
 
 	final static Logger logger = Logger.getLogger(PerfRepoClientWrapper.class);
 
@@ -51,8 +57,8 @@ public class PerfRepoClientWrapper {
 		try {
 			PerfRepoClientWrapper ptt = new PerfRepoClientWrapper();
 			ptt.loadSettings();
-			ptt.loadCSVs(ptt.settings.getDelimiter());
-			ptt.pushData(ptt.values, ptt.settings);
+			ptt.loadCSVs();
+			ptt.pushData();
 		} catch (Exception e) {
 			logger.error("Error occured, see below");
 			e.printStackTrace();
@@ -67,20 +73,50 @@ public class PerfRepoClientWrapper {
 		YamlReader reader = new YamlReader(new FileReader(file));
 		settings = (Settings) reader.read();
 		// equivalent but easier access
-		values = settings.metrics;
+		values = (ArrayList<CSVColMap>) settings.metrics.clone();
 		settings.printSettings();
 	}
 
-	public void loadCSVs(String delimeter) {
-		// csvs = new ArrayList<CSVFile>();
-		logger.info("CSVs file expected delimiter: " + delimeter);
-		for (CSVColMap colMap : settings.metrics) {
-			CSVFile csv = this.loadCSV(delimeter, colMap.sourceCSVFilePath);
+	public void loadCSVs() {
+		logger.info("CSVs file expected delimiter: " + settings.getDelimiter());
+		for (CSVColMap colMap : values) {
+			CSVFile csv = this.loadCSV(settings.getDelimiter(),
+					colMap.sourceCSVFilePath);
+			/*
+			 * values multimetricParamCSVColumnName and
+			 * multimetricParamRemoteName are not necessary in *.yml config file
+			 * and takes care of multimetrics.
+			 */
+			if (colMap.multimetricParamCSVColumnName != null
+					&& colMap.multimetricParamRemoteName != null) {
+				/*
+				 * Parse time with format HH:mm:ss to [ms]
+				 */
+				if (colMap.multimetricParamCSVColumnName.matches("Time")) {
+					ArrayList<String> paramValues = csv
+							.getColumnValues(colMap.multimetricParamCSVColumnName);
+					try {
+						ArrayList<String> paramValuesTime = new ArrayList<String>();
+						SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+						sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+						for (String paramVal : paramValues) {
+							Date date = sdf.parse(paramVal);
+							paramValuesTime.add(String.valueOf(date.getTime()));
+						}
+						colMap.setParamValues(paramValuesTime);
+					} catch (ParseException e) {
+						e.printStackTrace();
+					}
+				} else {
+					// set metric values
+					colMap.setParamValues(csv
+							.getColumnValues(colMap.multimetricParamCSVColumnName));
+				}
+			}
 			for (MetricColRelation mcr : colMap.metricColRelation) {
-				mcr.values = csv.getColumnValues(mcr.CSVColumnName);
+				mcr.setValues(csv.getColumnValues(mcr.CSVColumnName));
 			}
 		}
-
 	}
 
 	public CSVFile loadCSV(String delimeter, String filePath) {
@@ -90,8 +126,7 @@ public class PerfRepoClientWrapper {
 		return csv;
 	}
 
-	public void pushData(ArrayList<CSVColMap> csvs, Settings data)
-			throws Exception {
+	public void pushData() throws Exception {
 		String host = Settings.getHost();
 		String url = Settings.getUrl();
 		String basicHash = Settings.getBasicHash();
@@ -116,11 +151,11 @@ public class PerfRepoClientWrapper {
 		}
 
 		// SET PARAMETERS
-		if (data.parameters != null) {
+		if (settings.parameters != null) {
 			logger.info("Loading parameters...");
 			String out = "";
-			Map<String, String> hm = data.parameters;
-			for (int i = 0; i < data.parameters.size(); i++) {
+			Map<String, String> hm = settings.parameters;
+			for (int i = 0; i < settings.parameters.size(); i++) {
 				for (String name : hm.keySet()) {
 					String key = name.toString();
 					String value = hm.get(name).toString();
@@ -132,10 +167,10 @@ public class PerfRepoClientWrapper {
 		}
 
 		// SET TAGS
-		if (data.tags != null) {
+		if (settings.tags != null) {
 			String out = "";
 			logger.info("Loading tags...");
-			for (String tag : data.tags) {
+			for (String tag : settings.tags) {
 				out += "\n\t" + tag;
 				testExecutionBuilder.tag(tag);
 			}
@@ -144,15 +179,38 @@ public class PerfRepoClientWrapper {
 
 		// SET VALUES
 		String out = "";
-		for (CSVColMap cm : values) {
-			logger.info("Loading values from file: " + cm.sourceCSVFilePath);
-			for (MetricColRelation mcr : cm.metricColRelation) {
+		for (CSVColMap colMap : values) {
+			logger.info("Loading values from file: " + colMap.sourceCSVFilePath);
+
+			for (MetricColRelation mcr : colMap.metricColRelation) {
 				out += "\n\t" + mcr.remoteMetricName + ":";
-				for (String val : mcr.values) {
-					testExecutionBuilder.value(mcr.remoteMetricName,
-							Double.parseDouble(val));
-					out += "\n\t\t" + val;
+				logger.info(mcr.getValues());
+
+				/*
+				 * values multimetricParamCSVColumnName and
+				 * multimetricParamRemoteName are not necessary in *.yml config
+				 * file and takes care of multimetrics.
+				 */
+				if (colMap.multimetricParamCSVColumnName != null
+						&& colMap.multimetricParamRemoteName != null) {
+					ArrayList<String> mcrValues = mcr.getValues();
+					ArrayList<String> paramValues = colMap.getParamValues();
+					for (int i = 0; i < mcrValues.size(); i++) {
+						testExecutionBuilder.value(mcr.remoteMetricName,
+								Double.parseDouble(mcrValues.get(i)),
+								colMap.multimetricParamRemoteName,
+								paramValues.get(i));
+						out += " " + mcrValues.get(i);
+					}
+				} else {
+					for (String val : mcr.getValues()) {
+						testExecutionBuilder.value(mcr.remoteMetricName,
+								Double.parseDouble(val));
+						out += " " + val;
+					}
+
 				}
+
 			}
 		}
 		logger.info(out);
@@ -165,13 +223,12 @@ public class PerfRepoClientWrapper {
 
 		// SET ATTACHMENTS - text/plain
 		logger.info("Loading attachments...");
-		for (String name : data.attachments.keySet()) {
-			ArrayList<String> value = (ArrayList<String>) data.attachments
+		for (String name : settings.attachments.keySet()) {
+			ArrayList<String> value = (ArrayList<String>) settings.attachments
 					.get(name);
 			client.uploadAttachment((long) testExecutionId,
 					new File(value.get(1)), value.get(0), name);
 		}
 
 	}
-
 }
