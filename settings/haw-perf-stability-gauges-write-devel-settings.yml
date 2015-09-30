@@ -1,7 +1,5 @@
 !org.hawkular.qe.tools.perfrepo.Settings
 perfrepo:
-   testUID: haw_write_stability_test
-   testExecturionName: haw_write_stability_test_exec_1
    csvFileDelimiter: \,
 parameters:
 # SET_PARAMETERS
@@ -10,8 +8,6 @@ tags:
 metrics:
 - !org.hawkular.qe.tools.perfrepo.CSVColMap
   sourceCSVFilePath: ./rt.csv
-  multimetricParamCSVColumnName: Time
-  multimetricParamRemoteName: Time [ms]
   metricColRelation:
   - !org.hawkular.qe.tools.perfrepo.MetricColRelation
     CSVColumnName: Maximum
@@ -30,8 +26,6 @@ metrics:
     remoteMetricName: Disk usage
 - !org.hawkular.qe.tools.perfrepo.CSVColMap
   sourceCSVFilePath: ./throughput.csv
-  multimetricParamCSVColumnName: Time
-  multimetricParamRemoteName: Time [ms]
   metricColRelation:
   - !org.hawkular.qe.tools.perfrepo.MetricColRelation
     CSVColumnName: Average

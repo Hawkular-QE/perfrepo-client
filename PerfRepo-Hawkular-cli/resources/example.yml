@@ -1,7 +1,7 @@
 !org.hawkular.qe.tools.perfrepo.Settings
 perfrepo:
    testUID: haw_write_stability_test
-   testExecturionName: haw_write_stability_test_exec_1
+   testExecutionName: haw_write_stability_test_exec_1
    csvFileDelimiter: \,
 parameters:
    commit_hash: aaaaa

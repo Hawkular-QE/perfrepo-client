@@ -90,9 +90,9 @@ public class Settings {
 	}
 
 	public String getTestExecutionName() {
-		return (System.getProperty("testExecturionName") != null ? System
-				.getProperty("testExecturionName") : perfrepo
-				.get("testExecturionName"));
+		return (System.getProperty("testExecutionName") != null ? System
+				.getProperty("testExecutionName") : perfrepo
+				.get("testExecutionName"));
 	}
 
 	public String getDelimiter() {
