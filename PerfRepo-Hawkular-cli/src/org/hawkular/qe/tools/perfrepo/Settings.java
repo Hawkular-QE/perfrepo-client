@@ -25,18 +25,20 @@ public class Settings {
 	public void printList(ArrayList<?> l, String label) {
 		PerfRepoClientWrapper.logger.info(label + ":");
 		String out = "";
-		for (Object value : l) {
-			if (value.getClass() == String.class)
-				out += "\n\t" + value;
-			if (value.getClass() == CSVColMap.class) {
-				CSVColMap cm = (CSVColMap) value;
-				out += "\n\tFile: " + cm.sourceCSVFilePath;
-				for (MetricColRelation mcr : cm.metricColRelation) {
-					out += "\n\t\tRemoteMetricName: " + mcr.remoteMetricName
-							+ "\tCSVColumnName: " + mcr.CSVColumnName;
+		if (l != null)
+			for (Object value : l) {
+				if (value.getClass() == String.class)
+					out += "\n\t" + value;
+				if (value.getClass() == CSVColMap.class) {
+					CSVColMap cm = (CSVColMap) value;
+					out += "\n\tFile: " + cm.sourceCSVFilePath;
+					for (MetricColRelation mcr : cm.metricColRelation) {
+						out += "\n\t\tRemoteMetricName: "
+								+ mcr.remoteMetricName + "\tCSVColumnName: "
+								+ mcr.CSVColumnName;
+					}
 				}
 			}
-		}
 		PerfRepoClientWrapper.logger.info(out);
 	}
 
@@ -45,18 +47,19 @@ public class Settings {
 	public void printHashMap(Map<String, ?> hm, String label) {
 		String out = "";
 		PerfRepoClientWrapper.logger.info(label + ":");
-		for (String name : hm.keySet()) {
-			String key = name.toString();
-			Object value = hm.get(name).toString();
-			if (value.getClass() == String.class)
-				out += "\n\t" + key + ": " + value + "";
-			if (value.getClass() == ArrayList.class) {
-				out += "\n\t" + key + ":";
-				for (String s : (ArrayList<String>) value) {
-					out += "\n\t\t" + s;
+		if (hm != null)
+			for (String name : hm.keySet()) {
+				String key = name.toString();
+				Object value = hm.get(name).toString();
+				if (value.getClass() == String.class)
+					out += "\n\t" + key + ": " + value + "";
+				if (value.getClass() == ArrayList.class) {
+					out += "\n\t" + key + ":";
+					for (String s : (ArrayList<String>) value) {
+						out += "\n\t\t" + s;
+					}
 				}
 			}
-		}
 		PerfRepoClientWrapper.logger.info(out);
 	}
 

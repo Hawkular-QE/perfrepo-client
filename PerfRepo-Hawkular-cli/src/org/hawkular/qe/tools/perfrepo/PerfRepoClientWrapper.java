@@ -167,6 +167,8 @@ public class PerfRepoClientWrapper {
 		}
 
 		// SET TAGS
+		testExecutionBuilder.tag(""); // set 1 empty tag otherwise
+										// NullPointerException is thrown
 		if (settings.tags != null) {
 			String out = "";
 			logger.info("Loading tags...");
@@ -177,7 +179,7 @@ public class PerfRepoClientWrapper {
 			logger.info(out);
 		}
 
-		// SET VALUES
+		// SET METRICS VALUES
 		String out = "";
 		for (CSVColMap colMap : values) {
 			logger.info("Loading values from file: " + colMap.sourceCSVFilePath);
@@ -218,17 +220,19 @@ public class PerfRepoClientWrapper {
 		// BUILD TEST EXECUTION
 		logger.info("Building test execution...");
 		TestExecution testExecution = testExecutionBuilder.build();
+
 		double testExecutionId = client.createTestExecution(testExecution);
 		logger.info("\tTestExecutionId: " + testExecutionId);
 
 		// SET ATTACHMENTS - text/plain
 		logger.info("Loading attachments...");
-		for (String name : settings.attachments.keySet()) {
-			ArrayList<String> value = (ArrayList<String>) settings.attachments
-					.get(name);
-			client.uploadAttachment((long) testExecutionId,
-					new File(value.get(1)), value.get(0), name);
+		if (settings.attachments != null && !settings.attachments.isEmpty()) {
+			for (String name : settings.attachments.keySet()) {
+				ArrayList<String> value = (ArrayList<String>) settings.attachments
+						.get(name);
+				client.uploadAttachment((long) testExecutionId,
+						new File(value.get(1)), value.get(0), name);
+			}
 		}
-
 	}
 }
