@@ -3,6 +3,13 @@ package org.hawkular.qe.tools.perfrepo;
 import java.util.ArrayList;
 import java.util.Map;
 
+/**
+ * Describes structure that contains *.yml configuration file and handles
+ * settings of this program
+ * 
+ * @author vprusa
+ *
+ */
 public class Settings {
 
 	// Test Execution Tags
@@ -22,6 +29,12 @@ public class Settings {
 		printHashMap(perfrepo, "perfrepo");
 	}
 
+	/**
+	 * Prints lists used here
+	 * 
+	 * @param l
+	 * @param label
+	 */
 	public void printList(ArrayList<?> l, String label) {
 		PerfRepoClientWrapper.logger.info(label + ":");
 		String out = "";
@@ -42,6 +55,12 @@ public class Settings {
 		PerfRepoClientWrapper.logger.info(out);
 	}
 
+	/**
+	 * Prints Maps used here
+	 * 
+	 * @param hm
+	 * @param label
+	 */
 	@SuppressWarnings("unchecked")
 	// for line: for (String s : (ArrayList<String>) value) {
 	public void printHashMap(Map<String, ?> hm, String label) {
@@ -63,7 +82,7 @@ public class Settings {
 		PerfRepoClientWrapper.logger.info(out);
 	}
 
-	// *.yml file data getters
+	// *.yml file data getters - -D... arguments have priority
 
 	public String getTestUId() {
 		return (System.getProperty("testUID") != null ? System

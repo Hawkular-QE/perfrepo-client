@@ -7,6 +7,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
+ * Handles *.csv file and its data
+ * 
+ * Separate columns
+ * 
+ * @author vprusa
+ *
  */
 public class CSVFile {
 
@@ -17,6 +23,16 @@ public class CSVFile {
 	public String csvFilePath;
 	public String delimiter; // ;
 
+	/**
+	 * Loads *.csv file with delimiter into head and body Head is expected to be
+	 * first row with columns names Body is expected to be second and more rows
+	 * 
+	 * Head: Time|Name1|Name2 Body: 1:00|12345|67890 2:00|09876|54321
+	 * ....|.....|.....
+	 * 
+	 * @param csvFilePath
+	 * @param delimiter
+	 */
 	@SuppressWarnings("unchecked")
 	// for line: body = new ArrayList[head.length];
 	public CSVFile(String csvFilePath, String delimiter) {
@@ -58,6 +74,11 @@ public class CSVFile {
 		}
 	}
 
+	/**
+	 * 
+	 * @param name
+	 * @return values of column specified by "name" parameter
+	 */
 	public ArrayList<String> getColumnValues(String name) {
 		for (int i = 0; i < head.length; i++) {
 			if (head[i].matches(name)) {
@@ -67,6 +88,9 @@ public class CSVFile {
 		return null;
 	}
 
+	/**
+	 * Prints *.csv file - info/debug purposes
+	 */
 	public void printCSV() {
 		if (head == null || body == null)
 			return;

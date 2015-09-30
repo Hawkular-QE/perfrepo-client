@@ -29,7 +29,6 @@ import com.esotericsoftware.yamlbeans.YamlReader;
  */
 public class PerfRepoClientWrapper {
 
-	// public ArrayList<CSVFile> csvs;
 	public Settings settings;
 	public ArrayList<CSVColMap> values;
 	public static String help = "Pushes data from *.csv to PerfRepo with *.yml setting file\n"
@@ -46,6 +45,11 @@ public class PerfRepoClientWrapper {
 
 	final static Logger logger = Logger.getLogger(PerfRepoClientWrapper.class);
 
+	/**
+	 * Send data from *.csv files and *.yml configuration file to PerfRepo
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		logger.info("Starting PerfRepoClient wrapper\nRead more: https://github.com/Hawkular-QE/perfrepo-client");
 		// help printing
@@ -67,6 +71,13 @@ public class PerfRepoClientWrapper {
 		}
 	}
 
+	/**
+	 * Loads *.yml file and its settings to
+	 * org.hawkular.qe.tools.perfrepo.Settings class
+	 * 
+	 * @throws FileNotFoundException
+	 * @throws YamlException
+	 */
 	public void loadSettings() throws FileNotFoundException, YamlException {
 		String file = Settings.getSettingsFile();
 		logger.info("Loading settings file: " + file);
@@ -77,6 +88,9 @@ public class PerfRepoClientWrapper {
 		settings.printSettings();
 	}
 
+	/**
+	 * Loads data from *.csv files
+	 */
 	public void loadCSVs() {
 		logger.info("CSVs file expected delimiter: " + settings.getDelimiter());
 		for (CSVColMap colMap : values) {
@@ -119,6 +133,13 @@ public class PerfRepoClientWrapper {
 		}
 	}
 
+	/**
+	 * Load *.csv file with delimiter that separate columns
+	 * 
+	 * @param delimeter
+	 * @param filePath
+	 * @return CSVFile
+	 */
 	public CSVFile loadCSV(String delimeter, String filePath) {
 		logger.info("Loading CSV file: " + filePath);
 		CSVFile csv = new CSVFile(filePath, delimeter);
@@ -126,6 +147,15 @@ public class PerfRepoClientWrapper {
 		return csv;
 	}
 
+	/**
+	 * Push loaded data to PerfRepo
+	 * Pushed data: 
+	 * 	*.csv files values
+	 * 	tags
+	 * 	parameters
+	 * 	attachments
+	 * @throws Exception
+	 */
 	public void pushData() throws Exception {
 		String host = Settings.getHost();
 		String url = Settings.getUrl();
