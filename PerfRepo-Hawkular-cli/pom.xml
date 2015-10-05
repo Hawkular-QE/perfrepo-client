@@ -7,11 +7,6 @@
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>
-			<!-- <plugin> <artifactId>maven-compiler-plugin</artifactId> <version>3.1</version> 
-				<configuration> <source>1.8</source> <target>1.8</target> <archive> <manifest> 
-				<addClasspath>true</addClasspath> <mainClass>org.hawkular.qe.tools.perfrepo.PerfRepoClientWrapper</mainClass> 
-				</manifest> </archive> <descriptorRefs> <descriptorRef>jar-with-dependencies</descriptorRef> 
-				</descriptorRefs> </configuration> </plugin> -->
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>2.5.5</version>
@@ -41,4 +36,9 @@
 			<version>1.09</version>
 		</dependency>
 	</dependencies>
+	<parent>
+		<groupId>org.hawkular</groupId>
+		<artifactId>hawkular-parent</artifactId>
+		<version>17</version>
+	</parent>
 </project>

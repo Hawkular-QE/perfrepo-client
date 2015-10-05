@@ -11,25 +11,25 @@ import java.util.ArrayList;
  */
 public class CSVColMap {
 
-	// *.yml file data structure
+    // *.yml file data structure
 
-	public String sourceCSVFilePath;
-	public ArrayList<MetricColRelation> metricColRelation;
+    public String sourceCSVFilePath;
+    public ArrayList<MetricColRelation> metricColRelation;
 
-	// multimetric X-axis column name and remote metric name
-	public String multimetricParamCSVColumnName;
-	public String multimetricParamRemoteName;
+    // multimetric X-axis column name and remote metric name
+    public String multimetricParamCSVColumnName;
+    public String multimetricParamRemoteName;
 
-	// code only
+    // code only
 
-	private ArrayList<String> multimetricsParamValues;
+    private ArrayList<String> multimetricsParamValues;
 
-	public ArrayList<String> getParamValues() {
-		return multimetricsParamValues;
-	}
+    public ArrayList<String> getParamValues() {
+        return multimetricsParamValues;
+    }
 
-	public void setParamValues(ArrayList<String> multimetricsParamValues) {
-		this.multimetricsParamValues = multimetricsParamValues;
-	}
+    public void setParamValues(ArrayList<String> multimetricsParamValues) {
+        this.multimetricsParamValues = multimetricsParamValues;
+    }
 
 }

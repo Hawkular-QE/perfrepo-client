@@ -10,23 +10,23 @@ import java.util.ArrayList;
  */
 public class MetricColRelation {
 
-	// *.yml file data structure
+    // *.yml file data structure
 
-	// *.csv file column name
-	public String CSVColumnName;
-	// metric name in PerfRepo
-	public String remoteMetricName;
+    // *.csv file column name
+    public String CSVColumnName;
+    // metric name in PerfRepo
+    public String remoteMetricName;
 
-	// code only
-	// contains final values loaded from csv files
-	private ArrayList<String> values;
+    // code only
+    // contains final values loaded from csv files
+    private ArrayList<String> values;
 
-	public ArrayList<String> getValues() {
-		return values;
-	}
+    public ArrayList<String> getValues() {
+        return values;
+    }
 
-	public void setValues(ArrayList<String> values) {
-		this.values = values;
-	}
+    public void setValues(ArrayList<String> values) {
+        this.values = values;
+    }
 
 }
