@@ -1,3 +1,19 @@
+/*
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates
+ * and other contributors as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.hawkular.qe.tools.perfrepo;
 
 import java.io.File;
@@ -12,13 +28,11 @@ import java.util.Date;
 import java.util.Map;
 import java.util.TimeZone;
 
+import org.apache.log4j.Logger;
 import org.perfrepo.client.PerfRepoClient;
 import org.perfrepo.model.Test;
 import org.perfrepo.model.TestExecution;
 import org.perfrepo.model.builder.TestExecutionBuilder;
-import org.apache.log4j.Logger;
-import org.hawkular.qe.tools.perfrepo.CSVFile;
-import org.hawkular.qe.tools.perfrepo.Settings;
 
 import com.esotericsoftware.yamlbeans.YamlException;
 import com.esotericsoftware.yamlbeans.YamlReader;
@@ -43,11 +57,10 @@ public class PerfRepoClientWrapper {
             + "\n\t-csvFileDelimiter=\"./resources/example.yml\" resource YAML file"
             + "";
 
-    final static Logger logger = Logger.getLogger(PerfRepoClientWrapper.class);
+    static final Logger logger = Logger.getLogger(PerfRepoClientWrapper.class);
 
     /**
      * Send data from *.csv files and *.yml configuration file to PerfRepo
-     * 
      * @param args
      */
     public static void main(String[] args) {
@@ -74,10 +87,10 @@ public class PerfRepoClientWrapper {
     /**
      * Loads *.yml file and its settings to
      * org.hawkular.qe.tools.perfrepo.Settings class
-     * 
      * @throws FileNotFoundException
      * @throws YamlException
      */
+    @SuppressWarnings("unchecked")
     public void loadSettings() throws FileNotFoundException, YamlException {
         String file = Settings.getSettingsFile();
         logger.info("Loading settings file: " + file);
@@ -135,7 +148,6 @@ public class PerfRepoClientWrapper {
 
     /**
      * Load *.csv file with delimiter that separate columns
-     * 
      * @param delimeter
      * @param filePath
      * @return CSVFile
@@ -149,11 +161,8 @@ public class PerfRepoClientWrapper {
 
     /**
      * Push loaded data to PerfRepo
-     * Pushed data: 
-     * 	*.csv files values
-     * 	tags
-     * 	parameters
-     * 	attachments
+     * Pushed data:
+     *  *.csv files values, tags, parameters, attachments
      * @throws Exception
      */
     public void pushData() throws Exception {
@@ -185,13 +194,11 @@ public class PerfRepoClientWrapper {
             logger.info("Loading parameters...");
             String out = "";
             Map<String, String> hm = settings.parameters;
-            for (int i = 0; i < settings.parameters.size(); i++) {
-                for (String name : hm.keySet()) {
-                    String key = name.toString();
-                    String value = hm.get(name).toString();
-                    out += "\n\t" + key + ": " + value;
-                    testExecutionBuilder.parameter(key, value);
-                }
+            for (String name : hm.keySet()) {
+                String key = name.toString();
+                String value = hm.get(name).toString();
+                out += "\n\t" + key + ": " + value;
+                testExecutionBuilder.parameter(key, value);
             }
             logger.info(out);
         }
