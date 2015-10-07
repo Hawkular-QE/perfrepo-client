@@ -58,6 +58,7 @@
 						<exclude>**/README.*</exclude>
 						<exclude>**/pom.xml</exclude>
 						<exclude>**/*.csv</exclude>
+						<exclude>**/resources/*.txt</exclude>
 						<exclude>**/example.txt</exclude>
 					</excludes>
 				</configuration>
