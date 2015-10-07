@@ -1,0 +1,80 @@
+#
+# Copyright 2015 Red Hat, Inc. and/or its affiliates
+# and other contributors as indicated by the @author tags.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# Example setting file for PerfRepo-Client-Wrapper 
+# lines that starts with ! are used by com.esotericsoftware.yamlbeans
+# store information for PerfRepo client
+# 1) can be set via command argument
+# 2) optional
+!org.hawkular.qe.tools.perfrepo.Settings
+perfrepo:
+   testUID: haw_write_stability_test # 1) PerfRepo TestUID
+   testExecutionName: haw_write_stability_test_exec_1 # 1) PerfRepo TestExecution name
+   csvFileDelimiter: \, # 1) *.csv files delimiter, for ALL files same
+# parameters added to new PerfRepo TestExecution
+parameters:
+   commit_hash: commit_hash # 2)
+   commit_message: commit_message # 2)
+# tags added to new PerfRepo TestExecution
+tags:
+- tag1 # 2)
+- tag2 # 2)
+- tag3 # 2)
+# describe relations between PerfRepo Metrics and *.csv files columns
+metrics:
+- !org.hawkular.qe.tools.perfrepo.CSVColMap
+  sourceCSVFilePath: ./src/main/resources/gauges-post-response-stats.csv # *.csv file path containing values
+  multimetricParamCSVColumnName: Time # 2), Used with PerfRepo multimetric - X-axis column name
+  multimetricParamRemoteName: Time [ms] # 2), Used with PerfRepo multimetric - X-axis PerfRepo label
+  metricColRelation: # list of relations between PerfRepo metric name and *.csv file columns names
+  - !org.hawkular.qe.tools.perfrepo.MetricColRelation
+    CSVColumnName: Maximum # *.csv file column name - first row only
+    remoteMetricName: Response time - max # PerfRepo Metric name
+  - !org.hawkular.qe.tools.perfrepo.MetricColRelation
+    CSVColumnName: Average
+    remoteMetricName: Response time - avg
+  - !org.hawkular.qe.tools.perfrepo.MetricColRelation
+    CSVColumnName: Minimum
+    remoteMetricName: Response time - min
+- !org.hawkular.qe.tools.perfrepo.CSVColMap
+  sourceCSVFilePath: ./src/main/resources/gauges-post-disk-usage.csv
+  metricColRelation:
+  - !org.hawkular.qe.tools.perfrepo.MetricColRelation
+    CSVColumnName: Disk usage
+    remoteMetricName: Disk usage
+- !org.hawkular.qe.tools.perfrepo.CSVColMap
+  sourceCSVFilePath: ./src/main/resources/gauges-post-throughput-stats.csv
+  multimetricParamCSVColumnName: Time # 2)
+  multimetricParamRemoteName: Time [ms] # 2)
+  metricColRelation:
+  - !org.hawkular.qe.tools.perfrepo.MetricColRelation
+    CSVColumnName: Average
+    remoteMetricName: Throughput - avg
+  - !org.hawkular.qe.tools.perfrepo.MetricColRelation
+    CSVColumnName: Minimum
+    remoteMetricName: Throughput - min
+  - !org.hawkular.qe.tools.perfrepo.MetricColRelation
+    CSVColumnName: Maximum
+    remoteMetricName: Throughput - max
+# Attachments that will be add to new PerfRepo TestExecution
+attachments:
+  exampleAttName: # name that will be displayed in PerfRepo
+  - text/plain # MIME type
+  - ./src/main/resources/example.yml # path to file
+  exampleAttName2:
+  - text/plain
+  - ./src/main/resources/example.yml
