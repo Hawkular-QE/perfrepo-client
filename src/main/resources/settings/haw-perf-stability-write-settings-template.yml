@@ -36,5 +36,11 @@ metrics:
   - !org.hawkular.qe.tools.perfrepo.MetricColRelation
     CSVColumnName: Maximum
     remoteMetricName: Throughput - max
+- !org.hawkular.qe.tools.perfrepo.CSVColMap
+  sourceCSVFilePath: ./datapoints.csv
+  metricColRelation:
+  - !org.hawkular.qe.tools.perfrepo.MetricColRelation
+    CSVColumnName: Datapoints
+    remoteMetricName: Datapoints
 attachments:
 # SET_ATTACHMENTS
