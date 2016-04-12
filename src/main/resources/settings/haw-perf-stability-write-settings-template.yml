@@ -24,6 +24,9 @@ metrics:
   - !org.hawkular.qe.tools.perfrepo.MetricColRelation
     CSVColumnName: Cassandra_disk_usage
     remoteMetricName: Disk usage
+  - !org.hawkular.qe.tools.perfrepo.MetricColRelation
+    CSVColumnName: Cassandra_disk_usage_data
+    remoteMetricName: Disk usage - data directory
 - !org.hawkular.qe.tools.perfrepo.CSVColMap
   sourceCSVFilePath: ./throughput.csv
   metricColRelation:
